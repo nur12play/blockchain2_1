@@ -1,0 +1,30 @@
+                                     check contract 
+const factoryAddress = "СЮДА_ВСТАВЬ_АДРЕС_FACTORY";
+const Factory = await ethers.getContractFactory("Factory");
+const factory = Factory.attach(factoryAddress);
+                                    createChild
+let tx = await factory.createChild("FirstChild", { value: ethers.parseEther("1") });
+await tx.wait();
+                                    check
+await factory.getDeployedContracts();
+(await factory.getCount()).toString();
+                                    createChild2
+const salt = ethers.keccak256(ethers.toUtf8Bytes("salt1"));
+tx = await factory.createChild2("SecondChild", salt, { value: ethers.parseEther("0.5") });
+await tx.wait();
+                                    check
+await factory.getDeployedContracts();
+                                    check address
+const [signer] = await ethers.getSigners();
+const predicted = await factory.predictCreate2Address(
+  signer.address,
+  "ThirdChild",
+  ethers.keccak256(ethers.toUtf8Bytes("salt2"))
+);
+predicted;
+                                create Child for  createChild2 
+tx = await factory.createChild2(
+  "ThirdChild",
+  ethers.keccak256(ethers.toUtf8Bytes("salt2"))
+);
+await tx.wait();
